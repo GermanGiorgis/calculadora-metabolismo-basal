@@ -1,0 +1,2680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Metabolismo Basal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Chrome — Aethera monochrome system */
+    --mint: #000000;
+    --mint-dim: #262626;
+    --mint-soft: #f4f3f3;
+    /* Goal accents — kept as the system's one deliberate spot of color */
+    --coral: #e15a4f;
+    --coral-soft: #fbe0dc;
+    --blue: #bb9550;
+    --blue-soft: #f4f3f3;
+    --pink: #c17f5c;
+    --pink-soft: #f5e1d3;
+    --sage: #b7bf95;
+    --sage-soft: #f4f3f3;
+    --error: #c24a3f;
+
+    --card: #ffffff;
+    --card-border: #e5e5e5;
+    --text: #000000;
+    --text-dim: #6F6F6F;
+    --input-bg: #f4f3f3;
+    --shadow: rgba(0,0,0,0.08);
+
+    --page-bg: #ffffff;
+    --panel-bg: #f4f3f3;
+    --panel-border: #e5e5e5;
+    --heading-color: #000000;
+    --subtitle-color: #6F6F6F;
+
+    --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  :root[data-theme="dark"] {
+    --card: #1a1a1a;
+    --card-border: #333333;
+    --text: #ffffff;
+    --text-dim: #a3a3a3;
+    --input-bg: #262626;
+    --shadow: rgba(0,0,0,0.35);
+    --mint: #ffffff;
+    --mint-dim: #d9d9d9;
+    --mint-soft: #262626;
+
+    --page-bg: #0a0a0a;
+    --panel-bg: #171717;
+    --panel-border: #333333;
+    --heading-color: #ffffff;
+    --subtitle-color: #a3a3a3;
+  }
+
+  * { box-sizing: border-box; }
+
+  input, select, textarea, button {
+    font-family: inherit;
+  }
+
+  html, body {
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+  }
+
+  #calculadora, #como-funciona, #glosario {
+    scroll-margin-top: 84px;
+  }
+
+  .card {
+    scroll-margin-top: 84px;
+  }
+
+  @media (min-width: 900px) {
+    html { font-size: 17px; }
+  }
+
+  @media (min-width: 1300px) {
+    html { font-size: 18px; }
+  }
+
+  @media (min-width: 1700px) {
+    html { font-size: 19px; }
+  }
+
+  body {
+    color: var(--text);
+    font-family: var(--font-body);
+    background-color: var(--page-bg);
+    transition: background-color 0.2s, color 0.2s;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* Navbar */
+
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 24px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-logo-mark {
+    width: 24px;
+    height: 24px;
+    color: var(--heading-color);
+    flex-shrink: 0;
+  }
+
+  .nav-wordmark {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+    color: var(--heading-color);
+  }
+
+  .nav-links {
+    display: none;
+    gap: 32px;
+  }
+
+  .nav-links a {
+    font-size: 0.9rem;
+    color: var(--subtitle-color);
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover {
+    color: var(--heading-color);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--card-border);
+    background: var(--card);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .nav-cta {
+    padding: 10px 20px;
+    background: var(--mint);
+    color: var(--page-bg);
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 999px;
+    transition: background 0.2s, transform 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-cta:hover {
+    background: var(--mint-dim);
+    transform: scale(1.03);
+  }
+
+  @media (min-width: 768px) {
+    .nav-links {
+      display: flex;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .navbar {
+      padding: 20px 56px;
+    }
+  }
+
+  /* Hero */
+
+  @keyframes fadeRise {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-rise {
+    animation: fadeRise 0.8s ease-out both;
+  }
+
+  .animate-fade-rise-delay {
+    animation: fadeRise 0.8s ease-out both;
+    animation-delay: 0.2s;
+  }
+
+  .animate-fade-rise-delay-2 {
+    animation: fadeRise 0.8s ease-out both;
+    animation-delay: 0.4s;
+  }
+
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    background: var(--page-bg);
+  }
+
+  .hero-video-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: #0a0a0a;
+    display: none;
+  }
+
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+  }
+
+  @media (min-width: 640px) {
+    .hero-video-wrap { display: block; }
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    background: var(--page-bg);
+    padding: 96px 16px 40px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 2.6rem;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--heading-color);
+    margin: 0;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--subtitle-color);
+  }
+
+  .subtitle {
+    color: var(--subtitle-color);
+    font-size: 1rem;
+    max-width: 26em;
+    margin: 20px 0 0;
+    line-height: 1.6;
+  }
+
+  .hero-cta {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 14px 28px;
+    background: var(--mint);
+    color: var(--page-bg);
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 999px;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .hero-cta:hover {
+    background: var(--mint-dim);
+    transform: scale(1.03);
+  }
+
+  @media (min-width: 640px) {
+    h1 { font-size: 3.6rem; }
+  }
+
+  @media (min-width: 900px) {
+    h1 { font-size: 4.6rem; }
+    .hero-copy { padding-top: 128px; padding-bottom: 60px; }
+  }
+
+  @media (min-width: 1300px) {
+    h1 { font-size: 5.5rem; }
+  }
+
+  /* Hero bottom panel */
+
+  .hero-panel-wrap {
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+    width: 100%;
+    max-width: 1100px;
+    padding: 48px 16px 0;
+  }
+
+  .hero-panel {
+    background: color-mix(in srgb, var(--card) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--card-border);
+    border-bottom: none;
+    padding: 32px 20px 0;
+  }
+
+  .hero-panel-row {
+    display: grid;
+    gap: 20px;
+  }
+
+  .micro-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .panel-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin: 10px 0 0;
+  }
+
+  .panel-break {
+    display: none;
+  }
+
+  .panel-body {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    align-self: end;
+    margin: 0;
+  }
+
+  .hero-hairline {
+    margin: 28px 0 0;
+    height: 1px;
+    background: var(--card-border);
+  }
+
+  .feature-rows {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .feature-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--input-bg);
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .feature-row:hover {
+    background: var(--card-border);
+  }
+
+  .feature-num {
+    color: var(--text-dim);
+    opacity: 0.75;
+  }
+
+  .feature-slash {
+    margin: 0 8px;
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+
+  .feature-label {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .feature-arrow {
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transition: transform 0.2s, color 0.2s;
+  }
+
+  .feature-row:hover .feature-arrow {
+    color: var(--text);
+    transform: translateX(3px);
+  }
+
+  @media (min-width: 768px) {
+    .hero-panel-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .panel-title { font-size: 2rem; }
+    .panel-break { display: inline; }
+    .panel-body { font-size: 0.95rem; }
+
+    .feature-rows {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .hero-panel { padding: 48px 40px 0; }
+    .panel-title { font-size: 2.3rem; }
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 56px 16px 64px;
+    position: relative;
+  }
+
+  .layout {
+    display: block;
+  }
+
+  .results-grid {
+    display: block;
+  }
+
+  @media (min-width: 900px) {
+    .container {
+      max-width: min(1500px, 94vw);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 36px;
+      align-items: start;
+      justify-content: center;
+    }
+
+    .layout:not(.has-results) {
+      grid-template-columns: 420px;
+    }
+
+    .layout:not(.has-results) .results-panel {
+      display: none;
+    }
+
+    .form-panel {
+      position: sticky;
+      top: 24px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: min-content;
+      align-items: start;
+      gap: 28px;
+    }
+
+    .results-grid .card {
+      margin-bottom: 0;
+    }
+
+    #questionsCard {
+      grid-column: 1 / -1;
+    }
+
+    #questionsCard .questions-list {
+      columns: 2;
+      column-gap: 40px;
+    }
+
+    #questionsCard .questions-list li {
+      break-inside: avoid;
+    }
+  }
+
+  @media (min-width: 1300px) {
+    .container {
+      max-width: min(1680px, 92vw);
+    }
+
+    .layout {
+      grid-template-columns: 460px 1fr;
+      gap: 44px;
+    }
+
+    .layout:not(.has-results) {
+      grid-template-columns: 460px;
+    }
+
+    .results-grid {
+      gap: 32px;
+    }
+  }
+
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .form-panel .card {
+    box-shadow: 0 10px 30px var(--shadow);
+  }
+
+  .card.accordion {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  #results.card {
+    border-radius: 22px;
+    border-color: var(--mint);
+    box-shadow: 0 18px 44px var(--shadow);
+  }
+
+  .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+    padding: 24px;
+    user-select: none;
+  }
+
+  .accordion-header:hover .section-title {
+    color: var(--mint-dim);
+  }
+
+  .accordion-header-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .accordion-header .section-title,
+  .accordion-header .section-subtitle {
+    margin-bottom: 0;
+  }
+
+  .accordion-header .section-subtitle {
+    margin-top: 4px;
+  }
+
+  .accordion-chevron {
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--text-dim);
+    transition: transform 0.3s ease;
+    margin-top: 3px;
+  }
+
+  .accordion.expanded .accordion-chevron {
+    transform: rotate(180deg);
+  }
+
+  .accordion-body-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease;
+  }
+
+  .accordion.expanded .accordion-body-wrap {
+    grid-template-rows: 1fr;
+  }
+
+  .accordion-body-inner {
+    overflow: hidden;
+  }
+
+  .accordion-body-content {
+    padding: 0 24px 24px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .accordion.expanded .accordion-body-content {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.1s;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="number"]:focus {
+    border-color: var(--mint);
+  }
+
+  textarea.comments-textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+
+  textarea.comments-textarea:focus {
+    border-color: var(--mint);
+  }
+
+  .gender-group {
+    display: flex;
+    gap: 10px;
+  }
+
+  .gender-btn {
+    flex: 1;
+    padding: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text-dim);
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .gender-btn.active {
+    border-color: var(--mint);
+    color: var(--mint-dim);
+    background: var(--mint-soft);
+  }
+
+  select {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  button.calc {
+    width: 100%;
+    padding: 14px;
+    background: var(--mint);
+    border: none;
+    border-radius: 12px;
+    color: var(--page-bg);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 4px;
+  }
+
+  button.calc:hover {
+    background: var(--mint-dim);
+  }
+
+  .results {
+    display: none;
+  }
+
+  .results.visible {
+    display: block;
+  }
+
+  .bmr-display {
+    text-align: center;
+    padding: 20px 0 24px;
+    border-bottom: 1px solid var(--card-border);
+    margin-bottom: 20px;
+  }
+
+  .bmr-eyebrow {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .bmr-value {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    font-weight: 600;
+    color: var(--mint-dim);
+    line-height: 1;
+  }
+
+  .bmr-label {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-top: 8px;
+  }
+
+  .tdee-value {
+    font-size: 1.05rem;
+    color: var(--text);
+    margin-top: 12px;
+  }
+
+  .tdee-value strong {
+    color: var(--mint-dim);
+  }
+
+  .bmi-section {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .bmi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .bmi-label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .bmi-value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .bmi-bar {
+    position: relative;
+    height: 10px;
+    border-radius: 6px;
+    background: linear-gradient(to right, var(--sage) 0%, var(--sage) 25%, var(--mint) 25%, var(--mint) 50%, var(--blue) 50%, var(--blue) 75%, var(--coral) 75%, var(--coral) 100%);
+  }
+
+  .bmi-marker {
+    position: absolute;
+    top: -4px;
+    width: 4px;
+    height: 18px;
+    border-radius: 2px;
+    background: var(--text);
+    transform: translateX(-50%);
+    transition: left 0.5s ease-out;
+  }
+
+  .bmi-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-top: 5px;
+  }
+
+  .bmi-category {
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin: 8px 0 4px;
+    color: var(--text);
+  }
+
+  .bmi-disclaimer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin: 0;
+  }
+
+  .calorie-compare {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .calorie-row {
+    padding: 16px 14px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+  }
+
+  .calorie-row.maintenance {
+    background: var(--mint-soft);
+    border-color: var(--mint);
+  }
+
+  .calorie-macros {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--card-border);
+    font-size: 0.76rem;
+    color: var(--text-dim);
+  }
+
+  .calorie-macros strong {
+    color: var(--text);
+  }
+
+  .macro-note {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  .calorie-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 8px;
+  }
+
+  .calorie-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .deficit .calorie-dot { background: var(--coral); }
+  .maintenance .calorie-dot { background: var(--mint-dim); }
+  .surplus .calorie-dot { background: var(--blue); }
+
+  .calorie-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .calorie-desc {
+    display: block;
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  .calorie-kcal {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .deficit .calorie-kcal { color: var(--coral); }
+  .maintenance .calorie-kcal { color: var(--mint-dim); }
+  .surplus .calorie-kcal { color: var(--blue); }
+
+  .note {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  .error {
+    color: var(--error);
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .section-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .exercise-block {
+    margin-bottom: 20px;
+  }
+
+  .exercise-block:last-child {
+    margin-bottom: 0;
+  }
+
+  .exercise-block-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .exercise-icon {
+    font-size: 1.1rem;
+  }
+
+  .exercise-block-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .exercise-block-title.cardio { color: var(--blue); }
+  .exercise-block-title.strength { color: var(--coral); }
+
+  .exercise-item {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+
+  .exercise-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .exercise-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+    color: var(--text);
+  }
+
+  .exercise-why {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.45;
+  }
+
+  .questions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+    counter-reset: q-counter;
+  }
+
+  .questions-list li {
+    counter-increment: q-counter;
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--card-border);
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .questions-list li:last-child {
+    border-bottom: none;
+  }
+
+  .questions-list li::before {
+    content: counter(q-counter);
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--pink-soft);
+    color: var(--pink);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  button.copy-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  button.copy-btn:hover {
+    border-color: var(--mint);
+    color: var(--mint-dim);
+  }
+
+  button.copy-btn.copied {
+    border-color: var(--mint);
+    color: var(--mint-dim);
+  }
+
+  .profile-badge {
+    display: inline-block;
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  .activity-tip {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.5;
+    margin-top: 12px;
+  }
+
+  .activity-tip strong { color: var(--text); }
+
+  .warning-card {
+    background: var(--coral-soft);
+    border: 1px solid rgba(225,90,79,0.35);
+    border-radius: 20px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.55;
+    display: none;
+  }
+
+  .warning-card.visible { display: block; }
+
+  .warning-card strong { color: var(--coral); }
+
+  .glossary-card {
+    cursor: default;
+  }
+
+  .glossary-card summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text);
+    list-style: none;
+  }
+
+  .glossary-card summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .glossary-card summary::after {
+    content: '▾';
+    float: right;
+    color: var(--text-dim);
+  }
+
+  .glossary-card[open] summary::after {
+    content: '▴';
+  }
+
+  .glossary-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .glossary-item {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+
+  .glossary-term {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--mint-dim);
+    margin-bottom: 3px;
+  }
+
+  .glossary-def {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  @media (min-width: 900px) {
+    .glossary-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .condition-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .condition-chip {
+    padding: 8px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+  }
+
+  .condition-chip.active {
+    border-color: var(--mint);
+    color: var(--mint);
+    background: var(--mint-soft);
+  }
+
+  .health-block {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-left: 4px solid var(--coral);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+
+  .health-block:last-child {
+    margin-bottom: 0;
+  }
+
+  .health-block-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--coral);
+    margin-bottom: 6px;
+  }
+
+  .health-block p {
+    margin: 0 0 6px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .health-block p:last-child {
+    margin-bottom: 0;
+  }
+
+  .health-block .specialist {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  button.share-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 16px;
+  }
+
+  button.share-btn:hover {
+    border-color: var(--mint);
+    color: var(--mint-dim);
+  }
+
+  button.export-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--mint);
+    border: none;
+    border-radius: 12px;
+    color: var(--page-bg);
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 10px;
+  }
+
+  button.export-btn:hover {
+    background: var(--mint-dim);
+  }
+
+  #printSheet {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      margin: 12mm;
+      size: A4;
+    }
+
+    .navbar, .hero {
+      display: none !important;
+    }
+
+    .container {
+      display: none !important;
+    }
+
+    #printSheet {
+      display: block;
+      width: 100%;
+      padding: 0;
+      background: #ffffff;
+      color: #191919;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    #printSheet .print-brand {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #191919;
+    }
+
+    #printSheet .print-logo-mark {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    #printSheet h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+      margin: 6px 0 0;
+      color: #191919;
+    }
+
+    #printSheet .print-meta {
+      font-size: 9px;
+      color: #767676;
+      margin: 3px 0 0;
+    }
+
+    #printSheet .print-hairline {
+      height: 1px;
+      background: #e2e2e2;
+      margin: 12px 0;
+    }
+
+    #printSheet h2 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 500;
+      font-size: 13.5px;
+      margin: 0 0 8px;
+      color: #191919;
+      break-after: avoid;
+    }
+
+    #printSheet .print-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px;
+    }
+
+    #printSheet .print-datalist {
+      margin: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    #printSheet .print-datalist > div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px dotted #ddd;
+      padding-bottom: 3px;
+    }
+
+    #printSheet .print-datalist dt {
+      color: #767676;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    #printSheet .print-datalist dd {
+      margin: 0;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    #printSheet .print-note {
+      font-size: 9px;
+      color: #555;
+      margin: 8px 0 0;
+    }
+
+    #printSheet .print-tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin: 6px 0 0;
+    }
+
+    #printSheet .print-tag {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 2px 9px;
+      font-size: 8.5px;
+    }
+
+    #printSheet .print-calorie-compare {
+      display: grid;
+      gap: 6px;
+    }
+
+    #printSheet .print-calorie {
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 7px 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #printSheet .print-calorie-label {
+      font-size: 9.5px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    #printSheet .print-calorie-kcal {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 16px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    #printSheet .print-calorie-macros {
+      font-size: 8.5px;
+      color: #767676;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    #printSheet .print-comments {
+      font-size: 9.5px;
+      white-space: pre-wrap;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 7px 10px;
+      margin: 0;
+    }
+
+    #printSheet .print-questions {
+      padding-left: 15px;
+      font-size: 9.5px;
+      margin: 0;
+      columns: 2;
+      column-gap: 24px;
+    }
+
+    #printSheet .print-questions li {
+      margin-bottom: 7px;
+      break-inside: avoid;
+      line-height: 1.35;
+    }
+
+    #printSheet .print-line {
+      display: block;
+      border-bottom: 1px solid #ccc;
+      height: 7px;
+      margin-top: 2px;
+    }
+
+    #printSheet .print-footer {
+      margin-top: 12px;
+      font-size: 8px;
+      color: #999;
+      text-align: center;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .card {
+      padding: 34px;
+      border-radius: 18px;
+    }
+
+    #results.card {
+      border-radius: 28px;
+    }
+
+    .card.accordion {
+      padding: 0;
+    }
+
+    .accordion-header {
+      padding: 34px;
+    }
+
+    .accordion-body-content {
+      padding: 0 34px 34px;
+    }
+
+    .calorie-row {
+      padding: 20px 22px;
+      border-radius: 16px;
+    }
+
+    .exercise-item, .health-block, .glossary-item {
+      padding: 18px 20px;
+      border-radius: 16px;
+    }
+
+    input[type="number"], select, textarea.comments-textarea {
+      padding: 16px 18px;
+      border-radius: 14px;
+    }
+
+    .gender-btn, .condition-chip {
+      padding: 16px;
+    }
+
+    button.calc, button.export-btn, button.share-btn, button.copy-btn {
+      padding: 18px;
+      border-radius: 14px;
+    }
+
+    .field {
+      margin-bottom: 24px;
+    }
+
+    .exercise-block {
+      margin-bottom: 28px;
+    }
+
+    .bmr-display {
+      padding: 28px 0 32px;
+      margin-bottom: 28px;
+    }
+
+    .bmi-section {
+      padding-bottom: 28px;
+      margin-bottom: 28px;
+    }
+
+    .questions-list li {
+      padding: 14px 0;
+    }
+  }
+</style>
+</head>
+<body>
+  <nav class="navbar">
+    <a class="nav-logo" href="#top" aria-label="Ir al inicio">
+      <svg class="nav-logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M24 4 C13 4 4 13 4 24 C4 30.5 7.1 36.3 12 39.9" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M24 44 C35 44 44 35 44 24 C44 17.5 40.9 11.7 36 8.1" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M12 39.9 L6 40.5 L10 34.5 Z" fill="currentColor"/>
+        <path d="M36 8.1 L42 7.5 L38 13.5 Z" fill="currentColor"/>
+      </svg>
+      <span class="nav-wordmark">Metabolismo</span>
+    </a>
+    <div class="nav-links">
+      <a href="#calculadora">Calculadora</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#glosario">Glosario</a>
+    </div>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">🌙</button>
+      <a href="#calculadora" class="nav-cta">Calcular ahora</a>
+    </div>
+  </nav>
+
+  <section class="hero" id="top">
+    <div class="hero-video-wrap" aria-hidden="true">
+      <video id="heroVideo" class="hero-video" muted playsinline preload="none" crossorigin="anonymous" data-src="hero-bg.mp4"></video>
+    </div>
+
+    <div class="hero-copy">
+      <h1 class="animate-fade-rise">Conocé tu<br><em>metabolismo.</em></h1>
+      <p class="subtitle animate-fade-rise-delay">Calculadora de metabolismo basal para saber cuántas calorías necesitás cada día, con ejercicio, nutrición y un plan pensado para vos.</p>
+      <a href="#calculadora" class="hero-cta animate-fade-rise-delay-2">Calcular ahora</a>
+    </div>
+
+    <div class="hero-panel-wrap" id="como-funciona">
+      <div class="hero-panel">
+        <div class="hero-panel-row">
+          <div>
+            <div class="micro-label">¿QUÉ HACEMOS?</div>
+            <h2 class="panel-title">Datos que<br class="panel-break"> se entienden</h2>
+          </div>
+          <p class="panel-body">Una calculadora pensada para personas, no solo para números: te mostramos de dónde sale cada cálculo, lo adaptamos a tu edad y actividad, y te damos información clara para tu próxima consulta.</p>
+        </div>
+        <div class="hero-hairline"></div>
+        <div class="feature-rows">
+          <a href="#calculadora" class="feature-row">
+            <span><span class="feature-num">01</span><span class="feature-slash">/</span><span class="feature-label">Personalizado</span></span>
+            <svg class="feature-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="#calculadora" class="feature-row">
+            <span><span class="feature-num">02</span><span class="feature-slash">/</span><span class="feature-label">Basado en evidencia</span></span>
+            <svg class="feature-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="#glosario" class="feature-row">
+            <span><span class="feature-num">03</span><span class="feature-slash">/</span><span class="feature-label">Gratis y privado</span></span>
+            <svg class="feature-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container" id="calculadora">
+    <div class="layout" id="layoutRoot">
+    <div class="form-panel">
+    <div class="card">
+      <div class="field">
+        <label>Sexo</label>
+        <div class="gender-group">
+          <div class="gender-btn active" data-gender="male">Hombre</div>
+          <div class="gender-btn" data-gender="female">Mujer</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="weight">Peso (kg)</label>
+        <input type="number" id="weight" placeholder="Ej: 70" min="1" step="0.1">
+      </div>
+
+      <div class="field">
+        <label for="height">Altura (cm)</label>
+        <input type="number" id="height" placeholder="Ej: 175" min="1" step="0.1">
+      </div>
+
+      <div class="field">
+        <label for="age">Edad (años)</label>
+        <input type="number" id="age" placeholder="Ej: 28" min="1" step="1">
+      </div>
+
+      <div class="field">
+        <label for="activity">Nivel de actividad física</label>
+        <select id="activity">
+          <option value="1.2">Sedentario (poco o nada de ejercicio)</option>
+          <option value="1.375">Ligero (ejercicio 1-3 días/semana)</option>
+          <option value="1.55" selected>Moderado (ejercicio 3-5 días/semana)</option>
+          <option value="1.725">Intenso (ejercicio 6-7 días/semana)</option>
+          <option value="1.9">Muy intenso (trabajo físico o 2x/día)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>¿Tenés alguna condición de salud o discapacidad a tener en cuenta? (opcional)</label>
+        <div class="condition-group" id="conditionGroup">
+          <div class="condition-chip" data-condition="diabetes">Diabetes</div>
+          <div class="condition-chip" data-condition="hipertension">Hipertensión</div>
+          <div class="condition-chip" data-condition="cardiaca">Problema cardíaco</div>
+          <div class="condition-chip" data-condition="articular">Articular / artritis</div>
+          <div class="condition-chip" data-condition="obesidad">Obesidad</div>
+          <div class="condition-chip" data-condition="asma">Asma</div>
+          <div class="condition-chip" data-condition="osteoporosis">Osteoporosis</div>
+          <div class="condition-chip" data-condition="ansiedad">Ansiedad o depresión</div>
+          <div class="condition-chip" data-condition="lactosa">Intolerancia a la lactosa</div>
+          <div class="condition-chip" data-condition="celiaquia">Enfermedad celíaca / gluten</div>
+          <div class="condition-chip" data-condition="renal">Enfermedad renal</div>
+          <div class="condition-chip" data-condition="embarazo" data-gender="female">Embarazo</div>
+          <div class="condition-chip" data-condition="lactancia" data-gender="female">Lactancia materna</div>
+          <div class="condition-chip" data-condition="movilidad">Movilidad reducida</div>
+          <div class="condition-chip" data-condition="amputacion">Amputación / prótesis</div>
+          <div class="condition-chip" data-condition="sillaRuedas">Usuario de silla de ruedas</div>
+          <div class="condition-chip" data-condition="visual">Discapacidad visual</div>
+          <div class="condition-chip" data-condition="auditiva">Discapacidad auditiva</div>
+        </div>
+      </div>
+
+      <button class="calc" id="calcBtn">Calcular</button>
+      <p class="error" id="errorMsg">Por favor completa todos los campos con valores válidos.</p>
+    </div>
+    </div>
+
+    <div class="results-panel">
+    <div class="warning-card" id="minorWarning">
+      <strong>⚠️ Sos menor de edad.</strong> Tu cuerpo todavía está creciendo, así que las fórmulas de calorías y las recomendaciones de entrenamiento pensadas para adultos no aplican igual para vos. Los números de abajo son solo una referencia. Lo mejor es hablar con un pediatra o un nutricionista especializado en adolescentes antes de cambiar tu alimentación o empezar a entrenar.
+    </div>
+
+    <div class="card results accordion" id="results">
+      <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+        <div class="accordion-header-text">
+          <div class="section-title">📊 Tus resultados</div>
+          <p class="section-subtitle">Metabolismo basal, gasto calórico total, IMC y tus objetivos de calorías y macronutrientes.</p>
+        </div>
+        <span class="accordion-chevron">▾</span>
+      </div>
+      <div class="accordion-body-wrap">
+      <div class="accordion-body-inner">
+      <div class="accordion-body-content">
+      <div class="bmr-display">
+        <div class="bmr-eyebrow">🔥 Tu metabolismo basal</div>
+        <div class="bmr-value" id="bmrValue">0</div>
+        <div class="bmr-label">calorías/día en reposo (Metabolismo Basal)</div>
+        <div class="tdee-value">Gasto calórico total (TDEE): <strong id="tdeeValue">0</strong> kcal/día</div>
+      </div>
+
+      <div class="bmi-section">
+        <div class="bmi-header">
+          <span class="bmi-label">Índice de Masa Corporal (IMC)</span>
+          <span class="bmi-value" id="bmiValue">0</span>
+        </div>
+        <div class="bmi-bar">
+          <div class="bmi-marker" id="bmiMarker"></div>
+        </div>
+        <div class="bmi-scale">
+          <span>Bajo peso</span><span>Normal</span><span>Sobrepeso</span><span>Obesidad</span>
+        </div>
+        <p class="bmi-category" id="bmiCategory"></p>
+        <p class="bmi-disclaimer">El IMC es solo una referencia general: no distingue entre masa muscular y grasa corporal.</p>
+      </div>
+
+      <div class="calorie-compare">
+      <div class="calorie-row deficit">
+        <div class="calorie-label"><span class="calorie-dot"></span><span class="calorie-name">Déficit</span></div>
+        <div class="calorie-kcal" id="deficitValue">0 kcal</div>
+        <span class="calorie-desc">Para perder peso, ~0.5 kg/semana</span>
+        <div class="calorie-macros" id="deficitMacros"></div>
+      </div>
+
+      <div class="calorie-row maintenance">
+        <div class="calorie-label"><span class="calorie-dot"></span><span class="calorie-name">Mantenimiento</span></div>
+        <div class="calorie-kcal" id="maintenanceValue">0 kcal</div>
+        <span class="calorie-desc">Para sostener tu peso actual</span>
+        <div class="calorie-macros" id="maintenanceMacros"></div>
+      </div>
+
+      <div class="calorie-row surplus">
+        <div class="calorie-label"><span class="calorie-dot"></span><span class="calorie-name">Superávit</span></div>
+        <div class="calorie-kcal" id="surplusValue">0 kcal</div>
+        <span class="calorie-desc">Para ganar peso o masa muscular</span>
+        <div class="calorie-macros" id="surplusMacros"></div>
+      </div>
+      </div>
+
+      <p class="macro-note" id="macroNote"></p>
+      <p class="note">El déficit y superávit se calculan con ±500 kcal respecto al mantenimiento, un ritmo seguro y sostenible. Estos valores son estimaciones; consulta a un profesional de la salud para un plan personalizado.</p>
+      <button class="share-btn" id="shareBtn">📤 Descargar tarjeta para compartir</button>
+      </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="results-grid">
+    <div class="card results accordion" id="exerciseCard">
+      <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+        <div class="accordion-header-text">
+          <div class="section-title">🏋️ Mejores ejercicios para tu déficit calórico</div>
+          <p class="section-subtitle">Combinar cardio y fuerza es la estrategia más recomendada para perder grasa mientras conservas masa muscular.</p>
+        </div>
+        <span class="accordion-chevron">▾</span>
+      </div>
+      <div class="accordion-body-wrap">
+      <div class="accordion-body-inner">
+      <div class="accordion-body-content">
+      <div class="profile-badge" id="profileBadge">🎯 Tu perfil</div>
+      <div id="exerciseDynamic"></div>
+      </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="card results accordion" id="nutritionCard">
+      <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+        <div class="accordion-header-text">
+          <div class="section-title">🥑 Nutrición para tu etapa de vida</div>
+          <p class="section-subtitle">Consejos prácticos, explicados fácil, según tu edad.</p>
+        </div>
+        <span class="accordion-chevron">▾</span>
+      </div>
+      <div class="accordion-body-wrap">
+      <div class="accordion-body-inner">
+      <div class="accordion-body-content">
+      <div id="nutritionDynamic"></div>
+      </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="card results accordion" id="mealPlanCard">
+      <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+        <div class="accordion-header-text">
+          <div class="section-title">🍽️ Plan de comidas de ejemplo</div>
+          <p class="section-subtitle">Una guía simple para organizar tu día, según tu edad.</p>
+        </div>
+        <span class="accordion-chevron">▾</span>
+      </div>
+      <div class="accordion-body-wrap">
+      <div class="accordion-body-inner">
+      <div class="accordion-body-content">
+      <div id="mealPlanDynamic"></div>
+      </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="card results accordion" id="healthCard">
+      <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+        <div class="accordion-header-text">
+          <div class="section-title">⚕️ Información según tu salud</div>
+          <p class="section-subtitle">Esto no es un diagnóstico: son consideraciones generales para que llegues más informado a tu consulta.</p>
+        </div>
+        <span class="accordion-chevron">▾</span>
+      </div>
+      <div class="accordion-body-wrap">
+      <div class="accordion-body-inner">
+      <div class="accordion-body-content">
+      <div id="healthDynamic"></div>
+      </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="card results accordion" id="questionsCard">
+      <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+        <div class="accordion-header-text">
+          <div class="section-title">🥗 Preguntas para tu nutricionista</div>
+          <p class="section-subtitle">Si vas a agendar una consulta, estas preguntas te ayudan a aprovecharla al máximo.</p>
+        </div>
+        <span class="accordion-chevron">▾</span>
+      </div>
+      <div class="accordion-body-wrap">
+      <div class="accordion-body-inner">
+      <div class="accordion-body-content">
+      <ol class="questions-list" id="questionsList">
+        <li>¿Cuáles serían mis calorías y macronutrientes (proteínas, carbohidratos, grasas) ideales según mis objetivos y nivel de actividad?</li>
+        <li>¿Qué tan seguro es el déficit o superávit calórico que estoy considerando para mi caso particular?</li>
+        <li>¿Cómo debo distribuir las comidas a lo largo del día, incluyendo la alimentación pre y post entrenamiento?</li>
+        <li>¿Hay alimentos que deba priorizar o evitar por mis condiciones de salud, alergias o intolerancias?</li>
+        <li>¿Necesito algún tipo de suplementación (proteína, creatina, vitaminas, minerales)?</li>
+        <li>¿Cómo debo ajustar mi alimentación entre días de entrenamiento y días de descanso?</li>
+        <li>¿Cada cuánto tiempo deberíamos reevaluar mi peso y ajustar el plan?</li>
+        <li>¿Qué método de seguimiento me recomienda (báscula, medidas corporales, fotos, rendimiento en el gimnasio)?</li>
+        <li>¿Cómo puedo evitar el efecto rebote una vez termine el proceso de pérdida o ganancia de peso?</li>
+        <li>Si tengo alguna condición médica (tiroides, diabetes, resistencia a la insulina, etc.), ¿cómo afecta esto a mi plan alimenticio?</li>
+        <li id="extraQuestion">¿Cuáles serían mis calorías y macronutrientes ideales según mis objetivos?</li>
+      </ol>
+
+      <div class="field">
+        <label for="userComments">¿Querés agregar algún comentario o nota para tu nutricionista? (opcional)</label>
+        <textarea id="userComments" class="comments-textarea" placeholder="Ej: soy intolerante a la lactosa, entreno de noche, tengo poco tiempo para cocinar..."></textarea>
+      </div>
+
+      <button class="export-btn" id="exportBtn">🖨️ Exportar hoja para tu consulta (PDF)</button>
+      <button class="copy-btn" id="copyBtn">Copiar preguntas</button>
+      </div>
+      </div>
+      </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    <details class="card glossary-card" id="glosario">
+      <summary>📖 Glosario: términos que vas a escuchar</summary>
+      <div class="glossary-list">
+        <div class="glossary-item"><div class="glossary-term">Metabolismo Basal (BMR)</div><div class="glossary-def">La energía que tu cuerpo gasta en reposo total, solo para mantenerte con vida (respirar, bombear sangre, etc.), sin moverte.</div></div>
+        <div class="glossary-item"><div class="glossary-term">TDEE (Gasto calórico total)</div><div class="glossary-def">Todas las calorías que gastás en un día: tu metabolismo basal más el movimiento y el ejercicio que hacés.</div></div>
+        <div class="glossary-item"><div class="glossary-term">Déficit calórico</div><div class="glossary-def">Comer menos calorías de las que gastás. Hace que tu cuerpo use grasa almacenada como energía, lo que te hace bajar de peso.</div></div>
+        <div class="glossary-item"><div class="glossary-term">Superávit calórico</div><div class="glossary-def">Comer más calorías de las que gastás, generalmente para ganar peso o masa muscular.</div></div>
+        <div class="glossary-item"><div class="glossary-term">Macronutrientes</div><div class="glossary-def">Los tres nutrientes que aportan energía: proteínas, carbohidratos y grasas.</div></div>
+        <div class="glossary-item"><div class="glossary-term">Proteína</div><div class="glossary-def">El nutriente que más ayuda a construir y mantener el músculo.</div></div>
+        <div class="glossary-item"><div class="glossary-term">IMC (Índice de Masa Corporal)</div><div class="glossary-def">Una relación entre tu peso y tu altura usada como referencia general, aunque no distingue entre músculo y grasa.</div></div>
+        <div class="glossary-item"><div class="glossary-term">Sarcopenia</div><div class="glossary-def">La pérdida de masa muscular que ocurre naturalmente con la edad si no se hace ejercicio de fuerza.</div></div>
+      </div>
+    </details>
+  </div>
+
+  <div id="printSheet"></div>
+
+<script>
+  (function initHeroVideo() {
+    const video = document.getElementById('heroVideo');
+    if (!video) return;
+    if (!window.matchMedia('(min-width: 640px)').matches) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.src = video.dataset.src;
+    video.load();
+
+    const FADE_DURATION = 0.5;
+    const SLOW_MOTION_RATE = 0.55;
+    let rafId = null;
+
+    function tick() {
+      const duration = video.duration;
+      if (duration && !isNaN(duration)) {
+        const t = video.currentTime;
+        let opacity = 1;
+        if (t < FADE_DURATION) {
+          opacity = t / FADE_DURATION;
+        } else if (t > duration - FADE_DURATION) {
+          opacity = Math.max(0, (duration - t) / FADE_DURATION);
+        }
+        video.style.opacity = video.paused ? '0' : String(opacity);
+      }
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function retryPlayOnInteraction() {
+      const retry = () => { video.play().catch(() => {}); };
+      document.addEventListener('pointerdown', retry, { once: true });
+      document.addEventListener('scroll', retry, { once: true, passive: true });
+      document.addEventListener('keydown', retry, { once: true });
+    }
+
+    function startPlayback() {
+      video.playbackRate = SLOW_MOTION_RATE;
+      const playPromise = video.play();
+      if (playPromise && playPromise.catch) {
+        playPromise.catch(retryPlayOnInteraction);
+      }
+      if (!rafId) rafId = requestAnimationFrame(tick);
+    }
+
+    video.addEventListener('loadedmetadata', startPlayback);
+
+    video.addEventListener('ended', () => {
+      video.style.opacity = '0';
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      setTimeout(() => {
+        video.currentTime = 0;
+        startPlayback();
+      }, 100);
+    });
+  })();
+
+  const themeToggle = document.getElementById('themeToggle');
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    themeToggle.textContent = theme === 'light' ? '🌙' : '☀️';
+    try { localStorage.setItem('theme', theme); } catch (e) {}
+  }
+
+  let savedTheme = 'light';
+  try { savedTheme = localStorage.getItem('theme') || 'light'; } catch (e) {}
+  applyTheme(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'light' ? 'dark' : 'light');
+  });
+
+  let gender = 'male';
+
+  const AGE_LABELS = {
+    menor: 'Menor de 18 años',
+    joven: 'Adulto joven (18-39 años)',
+    adulto: 'Adulto (40-59 años)',
+    mayor: 'Adulto mayor (60+ años)'
+  };
+
+  const TIER_LABELS = {
+    principiante: 'Principiante',
+    intermedio: 'Intermedio',
+    avanzado: 'Avanzado'
+  };
+
+  function getAgeGroup(age) {
+    if (age < 18) return 'menor';
+    if (age <= 39) return 'joven';
+    if (age <= 59) return 'adulto';
+    return 'mayor';
+  }
+
+  function getActivityTier(activity) {
+    if (activity <= 1.375) return 'principiante';
+    if (activity <= 1.55) return 'intermedio';
+    return 'avanzado';
+  }
+
+  const EXERCISE_CONTENT = {
+    joven: {
+      cardio: [
+        { name: 'HIIT (intervalos de alta intensidad)', why: 'Tu cuerpo joven se recupera rápido, así que el HIIT rinde muy bien: quema muchas calorías en poco tiempo y sigue quemando horas después (esto se llama EPOC), incluso con sesiones cortas.' },
+        { name: 'Deportes o actividades que disfrutes (fútbol, básquet, spinning, boxeo)', why: 'A esta edad es más fácil sumar movimiento divirtiéndote. Lo que más impacta a largo plazo es la constancia, más que encontrar el ejercicio "perfecto".' },
+        { name: 'Cardio en Zona 2 (60-70% FC máxima)', why: 'Sigue siendo la base para quemar grasa de forma sostenida y mejorar la resistencia, incluso si lo combinás con entrenamientos más intensos.' }
+      ],
+      strength: [
+        { name: 'Fuerza con cargas progresivas, 4-5 veces por semana', why: 'Entre los 20 y los 30 años se alcanza el pico de masa muscular y ósea de toda la vida. Entrenar fuerza ahora genera una "reserva" que te protege en el futuro.' },
+        { name: 'Rutinas divididas (por ejemplo empuje / tracción / piernas)', why: 'A esta edad la recuperación suele ser más rápida, lo que te permite entrenar cada grupo muscular con más frecuencia y volumen.' },
+        { name: 'Ejercicios multiarticulares (sentadilla, peso muerto, press banca)', why: 'Son los que más músculo reclutan y más resultados dan por el tiempo que invertís.' }
+      ]
+    },
+    adulto: {
+      cardio: [
+        { name: 'Cardio en Zona 2 (caminar rápido, bici, elíptica)', why: 'A partir de los 40, cuidar las articulaciones se vuelve más importante. El cardio de intensidad baja-moderada quema grasa de forma eficiente sin generar tanto desgaste articular.' },
+        { name: 'HIIT de bajo impacto (bici, remo o elíptica en vez de saltos)', why: 'Podés seguir aprovechando los beneficios del HIIT (más gasto calórico en menos tiempo) eligiendo máquinas que golpeen menos las rodillas y caderas.' },
+        { name: 'Caminatas diarias', why: 'Sumar pasos todos los días es una forma simple y sostenible de aumentar tu gasto calórico sin agregarle estrés extra al cuerpo.' }
+      ],
+      strength: [
+        { name: 'Fuerza 2-3 veces por semana, sin faltar', why: 'Después de los 30 el cuerpo pierde músculo de forma gradual si no se entrena fuerza, un proceso llamado sarcopenia que se acelera con los años. Entrenar con pesas 2-3 veces por semana ayuda a frenarlo.' },
+        { name: 'Movilidad y flexibilidad antes o después de entrenar', why: 'Cuidar las articulaciones y mantener buena movilidad se vuelve tan importante como el ejercicio en sí para poder seguir entrenando sin lesiones.' },
+        { name: 'Ejercicios multiarticulares con buena técnica', why: 'Priorizar la técnica por sobre el peso máximo cuida las articulaciones a largo plazo y sigue dando muy buenos resultados.' }
+      ]
+    },
+    mayor: {
+      cardio: [
+        { name: 'Caminar a paso constante', why: 'Mejora la salud del corazón y ayuda a mantener el peso sin generar impacto fuerte en las articulaciones.' },
+        { name: 'Natación o aquagym', why: 'El agua sostiene el peso del cuerpo, así que podés mover el cuerpo y ejercitar el corazón con muy poco riesgo para rodillas y caderas.' },
+        { name: 'Bicicleta fija', why: 'Otra opción de bajo impacto, fácil de ajustar en intensidad según cómo te sientas cada día.' }
+      ],
+      strength: [
+        { name: 'Fuerza 2-3 veces por semana con pesos livianos a moderados', why: 'El entrenamiento de fuerza es seguro y muy efectivo incluso en edades muy avanzadas: hay casos documentados de personas de más de 90 años que duplicaron su fuerza muscular en pocas semanas de entrenamiento. Nunca es tarde para empezar.' },
+        { name: 'Ejercicios de equilibrio (pararse en un pie, taichí, yoga suave)', why: 'Mejorar el equilibrio reduce el riesgo de caídas, una de las principales causas de lesiones graves en personas mayores.' },
+        { name: 'Ejercicios funcionales (sentarse y pararse de una silla, subir escalones)', why: 'Entrenan justo los movimientos que usás todos los días, ayudando a mantener tu independencia.' }
+      ]
+    }
+  };
+
+  const ACTIVITY_TIP = {
+    principiante: 'Como estás empezando (o venís de poca actividad), no hace falta que hagas todo de una. Arrancá con 2-3 sesiones cortas por semana y subí de a poco: el cuerpo se adapta mejor con progresión gradual.',
+    intermedio: 'Ya tenés una buena base. Este es un buen momento para variar los estímulos (cambiar ejercicios, subir algo el peso o la intensidad) y seguir progresando.',
+    avanzado: 'Con tu nivel de actividad actual, el descanso es tan importante como el entrenamiento. Considerá una semana más liviana ("descarga") cada 4-6 semanas para evitar el sobreentrenamiento y las lesiones.'
+  };
+
+  const NUTRITION_CONTENT = {
+    joven: [
+      { title: 'Priorizá el total del día por sobre el horario', text: 'Lo que más importa para tus resultados es cuánto comés en el día completo, no comer cada 3 horas ni el horario exacto.' },
+      { title: 'Proteína: entre 1.6 y 2.2 g por kilo de peso', text: 'Si entrenás fuerza, este rango ayuda a construir y mantener músculo de forma óptima.' },
+      { title: 'Es un buen momento para construir hábitos de por vida', text: 'A esta edad el cuerpo responde rápido a los cambios, así que es un buen momento para aprender a comer balanceado de forma sostenible, no solo con dietas temporales.' }
+    ],
+    adulto: [
+      { title: 'Subí un poco la proteína', text: 'Entre 1.2 y 1.6 g por kilo de peso ayuda a contrarrestar la pérdida de músculo relacionada con la edad, incluso sin entrenar mucho más que antes.' },
+      { title: 'Cuidá el calcio y la vitamina D', text: 'Los huesos empiezan a perder densidad de forma gradual a partir de los 40-50 años, así que estos nutrientes se vuelven más importantes (lácteos, pescados grasos, huevo y algo de sol con moderación).' },
+      { title: 'Las porciones importan un poco más que antes', text: 'El metabolismo baja levemente con la edad, así que ajustar las cantidades (sin pasar hambre) suele ser más efectivo que "comer igual que a los 25".' }
+    ],
+    mayor: [
+      { title: 'Comé más proteína de lo que pensás', text: 'Entre 1.0 y 1.2 g por kilo de peso al día (más si hay alguna enfermedad), repartida entre las comidas, ayuda a proteger tus músculos.' },
+      { title: 'Tomá agua aunque no sientas mucha sed', text: 'Con la edad, el cuerpo siente menos la sed aunque la necesite igual, así que es fácil deshidratarse sin darte cuenta. Tomar agua en horarios fijos ayuda.' },
+      { title: 'Calcio y vitamina D para los huesos', text: 'Son clave para prevenir fracturas. Buenas fuentes son los lácteos y pescados grasos, y en muchos casos conviene un suplemento indicado por un profesional.' }
+    ],
+    menor: [
+      { title: 'Consultá siempre con un profesional', text: 'Durante la adolescencia el cuerpo todavía está creciendo. Un pediatra o nutricionista especializado en adolescentes es quien mejor puede indicarte cuánto y qué comer.' }
+    ]
+  };
+
+  const MEAL_PLAN_CONTENT = {
+    joven: [
+      { name: 'Desayuno (~25% del día)', example: 'Huevos revueltos (2-3) con pan integral y una fruta. Buena dosis de proteína para arrancar el día.' },
+      { name: 'Almuerzo (~30% del día)', example: 'Pollo o carne (150-200g) + arroz o papa + ensalada abundante con aceite de oliva.' },
+      { name: 'Merienda (~15% del día)', example: 'Yogur griego con avena y frutos secos, o un batido de proteína con banana.' },
+      { name: 'Cena (~30% del día)', example: 'Pescado o carne magra + vegetales + una porción de carbohidrato (quinoa, batata).' }
+    ],
+    adulto: [
+      { name: 'Desayuno (~25% del día)', example: 'Huevo o yogur con avena y fruta. Priorizar proteína ayuda a sentirte saciado más tiempo.' },
+      { name: 'Almuerzo (~30% del día)', example: 'Proteína magra (pollo, pescado, legumbres) + vegetales + carbohidrato integral.' },
+      { name: 'Merienda (~15% del día)', example: 'Fruta con un puñado de frutos secos, o un yogur natural.' },
+      { name: 'Cena (~30% del día)', example: 'Más liviana que el almuerzo: proteína + vegetales, cuidando la porción de carbohidrato.' }
+    ],
+    mayor: [
+      { name: 'Desayuno (~25% del día)', example: 'Huevo o yogur con fruta: una buena fuente de proteína para cuidar el músculo desde temprano.' },
+      { name: 'Almuerzo (~30% del día)', example: 'Proteína (carne, pescado, huevo, legumbres) + vegetales + una porción moderada de carbohidrato.' },
+      { name: 'Merienda (~15% del día)', example: 'Yogur o queso con fruta, para sumar proteína entre comidas.' },
+      { name: 'Cena (~30% del día)', example: 'Proteína + vegetales cocidos, fáciles de digerir. Sumá agua aunque no tengas sed.' }
+    ]
+  };
+
+  function renderMealPlanSection(ageGroup) {
+    const card = document.getElementById('mealPlanCard');
+    const container = document.getElementById('mealPlanDynamic');
+
+    if (ageGroup === 'menor') {
+      container.innerHTML = `<div class="exercise-item"><div class="exercise-why">Como sos menor de edad, un plan de comidas genérico no es apropiado para tu etapa de crecimiento. Un pediatra o nutricionista especializado en adolescentes es quien puede armarte un plan real.</div></div>`;
+      card.classList.add('visible');
+      return;
+    }
+
+    container.innerHTML = renderExerciseItems(
+      MEAL_PLAN_CONTENT[ageGroup].map(m => ({ name: m.name, why: m.example }))
+    );
+    card.classList.add('visible');
+  }
+
+  const EXTRA_QUESTION = {
+    joven: '¿Cómo puedo estructurar mi alimentación para ganar músculo o rendir mejor en mi deporte, de forma saludable?',
+    adulto: '¿Cómo puedo ajustar mi alimentación para compensar un metabolismo más lento y cuidar mis articulaciones y huesos?',
+    mayor: '¿Cómo puedo asegurarme de comer suficiente proteína para proteger mis músculos, y si necesito alguna vitamina extra (como D o B12)?',
+    menor: '¿Qué alimentación es adecuada para mi edad mientras mi cuerpo todavía está creciendo?'
+  };
+
+  const CONDITION_CONTENT = {
+    diabetes: {
+      label: 'Diabetes',
+      exercise: 'El ejercicio regular (sobre todo combinar cardio y fuerza) ayuda a tu cuerpo a usar mejor el azúcar en sangre. Es recomendable controlar tu glucosa antes y después de entrenar, y tener a mano algo con azúcar de acción rápida por si baja demasiado.',
+      nutrition: 'Repartir los carbohidratos a lo largo del día, en vez de comerlos todos juntos, suele ayudar a mantener el azúcar en sangre más estable.',
+      specialist: 'endocrinólogo o diabetólogo'
+    },
+    hipertension: {
+      label: 'Hipertensión',
+      exercise: 'El cardio moderado y constante ayuda a bajar la presión arterial con el tiempo. Conviene evitar levantar pesos muy altos aguantando la respiración, ya que eso puede elevar la presión de forma brusca.',
+      nutrition: 'Reducir el sodio (sal) de la dieta es una de las medidas más efectivas para ayudar a bajar la presión.',
+      specialist: 'cardiólogo o médico clínico'
+    },
+    cardiaca: {
+      label: 'Problema cardíaco',
+      exercise: 'Cualquier plan de ejercicio debería empezar de forma muy gradual y, en muchos casos, con supervisión médica (programas de rehabilitación cardíaca). Evitá entrenar a intensidades altas sin el visto bueno de tu cardiólogo.',
+      nutrition: 'Cuidar las grasas saturadas y el sodio suele ser parte central de una alimentación pensada para la salud del corazón.',
+      specialist: 'cardiólogo'
+    },
+    articular: {
+      label: 'Articular / artritis',
+      exercise: 'El ejercicio en agua (natación, aquagym) y la bicicleta son buenas opciones porque no cargan peso sobre las articulaciones. Es mejor evitar saltos o impactos fuertes si generan dolor.',
+      nutrition: 'Mantener un peso saludable reduce la carga sobre articulaciones como rodillas y caderas.',
+      specialist: 'reumatólogo, traumatólogo o kinesiólogo'
+    },
+    embarazo: {
+      label: 'Embarazo',
+      exercise: 'El ejercicio moderado suele ser seguro y beneficioso durante un embarazo sin complicaciones, pero siempre debe estar aprobado por tu obstetra, sobre todo en el primer y el tercer trimestre.',
+      nutrition: 'Las necesidades de calorías y nutrientes (como ácido fólico y hierro) cambian durante el embarazo, así que los cálculos generales de esta calculadora no aplican de la misma forma.',
+      specialist: 'obstetra/ginecólogo y un nutricionista especializado en embarazo'
+    },
+    lactancia: {
+      label: 'Lactancia materna',
+      exercise: 'El ejercicio moderado es generalmente seguro durante la lactancia y no afecta la producción de leche, pero es importante mantenerte bien hidratada.',
+      nutrition: 'Tus necesidades de calorías y líquidos aumentan durante la lactancia, así que los cálculos generales de esta calculadora no aplican de la misma forma.',
+      specialist: 'obstetra/ginecólogo o un nutricionista especializado en lactancia'
+    },
+    obesidad: {
+      label: 'Obesidad',
+      exercise: 'Conviene arrancar con actividades de bajo impacto (caminar, bicicleta, natación) y sumar fuerza de forma progresiva, cuidando las articulaciones mientras se construye una base de entrenamiento.',
+      nutrition: 'Un déficit calórico moderado y sostenido en el tiempo, sin restricciones extremas, suele dar mejores resultados a largo plazo que las dietas muy agresivas.',
+      specialist: 'médico nutricionista o especialista en obesidad'
+    },
+    asma: {
+      label: 'Asma',
+      exercise: 'El ejercicio aeróbico progresivo mejora la capacidad respiratoria a largo plazo, pero conviene tener el inhalador de rescate a mano y calentar bien antes de entrenar, sobre todo con aire frío o seco.',
+      nutrition: '',
+      specialist: 'neumonólogo o médico de cabecera'
+    },
+    osteoporosis: {
+      label: 'Osteoporosis',
+      exercise: 'El entrenamiento de fuerza y los ejercicios con impacto controlado (como caminar) ayudan a mantener la densidad ósea, pero conviene evitar flexiones bruscas de columna o situaciones de alto riesgo de caída.',
+      nutrition: 'El calcio y la vitamina D son especialmente importantes para la salud de tus huesos.',
+      specialist: 'traumatólogo o reumatólogo'
+    },
+    ansiedad: {
+      label: 'Ansiedad o depresión',
+      exercise: 'El ejercicio regular, incluso caminatas cortas, tiene un efecto comprobado en mejorar el estado de ánimo. Elegir actividades que disfrutes ayuda a sostener el hábito en el tiempo.',
+      nutrition: '',
+      specialist: 'psicólogo, psiquiatra o médico de cabecera'
+    },
+    lactosa: {
+      label: 'Intolerancia a la lactosa',
+      exercise: '',
+      nutrition: 'Buscar fuentes alternativas de calcio y proteína (lácteos deslactosados, bebidas vegetales fortificadas, quesos curados) ayuda a cubrir tus necesidades sin malestar digestivo.',
+      specialist: 'nutricionista'
+    },
+    celiaquia: {
+      label: 'Enfermedad celíaca / intolerancia al gluten',
+      exercise: '',
+      nutrition: 'Es clave revisar el etiquetado de todos los alimentos y suplementos (incluidos los batidos de proteína) para evitar el gluten de forma estricta.',
+      specialist: 'gastroenterólogo o nutricionista especializado'
+    },
+    renal: {
+      label: 'Enfermedad renal',
+      exercise: 'El ejercicio moderado suele ser beneficioso, pero la intensidad debe ajustarse según el estado de tu función renal.',
+      nutrition: 'Las necesidades de proteína, sodio, potasio y fósforo cambian mucho según el grado de la enfermedad, así que los cálculos genéricos de esta calculadora no aplican para tu caso.',
+      specialist: 'nefrólogo'
+    },
+    amputacion: {
+      label: 'Amputación / uso de prótesis',
+      exercise: 'Existen adaptaciones para prácticamente todos los ejercicios (versiones sentadas, con apoyo o unilaterales). Un profesional en rehabilitación puede ayudarte a armar una rutina según tu tipo de amputación.',
+      nutrition: '',
+      specialist: 'médico fisiatra o kinesiólogo especializado'
+    },
+    sillaRuedas: {
+      label: 'Usuario de silla de ruedas',
+      exercise: 'El entrenamiento de fuerza para tren superior y el cardio adaptado (como el handbike o la natación) te permiten entrenar de forma completa.',
+      nutrition: 'Tu gasto calórico diario probablemente sea distinto al que muestra esta calculadora estándar, ya que está pensada para personas que caminan.',
+      specialist: 'médico fisiatra o kinesiólogo especializado'
+    },
+    movilidad: {
+      label: 'Movilidad reducida',
+      exercise: 'Los ejercicios sentado o con apoyo (bandas elásticas, pesas livianas, ejercicios en silla) permiten seguir entrenando fuerza y movilidad de forma segura y adaptada a tu situación.',
+      nutrition: 'Si tu gasto energético diario es menor por la movilidad reducida, tus necesidades calóricas probablemente sean distintas a las que muestra esta calculadora estándar.',
+      specialist: 'kinesiólogo o médico fisiatra'
+    },
+    visual: {
+      label: 'Discapacidad visual',
+      exercise: 'Caminar con acompañante o guía, la bicicleta fija y el entrenamiento de fuerza con instrucciones verbales claras suelen ser buenas opciones accesibles.',
+      nutrition: '',
+      specialist: 'médico de cabecera para adaptar cualquier recomendación a tu situación particular'
+    },
+    auditiva: {
+      label: 'Discapacidad auditiva',
+      exercise: 'Las clases grupales pueden adaptarse con instrucciones visuales o escritas; entrenar con una rutina escrita paso a paso suele ser más fácil de seguir de forma autónoma.',
+      nutrition: '',
+      specialist: 'médico de cabecera para adaptar cualquier recomendación a tu situación particular'
+    }
+  };
+
+  function renderHealthSection(selectedIds) {
+    const card = document.getElementById('healthCard');
+    const container = document.getElementById('healthDynamic');
+
+    if (!selectedIds.length) {
+      card.classList.remove('visible');
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = selectedIds.map(id => {
+      const c = CONDITION_CONTENT[id];
+      const nutritionHtml = c.nutrition ? `<p>🍽️ ${c.nutrition}</p>` : '';
+      return `
+        <div class="health-block">
+          <div class="health-block-title">${c.label}</div>
+          <p>🏋️ ${c.exercise}</p>
+          ${nutritionHtml}
+          <p>Lo mejor es que esto lo confirme un <span class="specialist">${c.specialist}</span>.</p>
+        </div>
+      `;
+    }).join('');
+    card.classList.add('visible');
+  }
+
+  const PROTEIN_PER_KG = { joven: 1.8, adulto: 1.6, mayor: 1.3, menor: 1.2 };
+  const FAT_PERCENT = 0.28;
+
+  function computeMacros(weight, totalKcal, ageGroup) {
+    const proteinG = Math.round(weight * (PROTEIN_PER_KG[ageGroup] || 1.6));
+    const proteinKcal = proteinG * 4;
+    const fatKcal = totalKcal * FAT_PERCENT;
+    const fatG = Math.round(fatKcal / 9);
+    const carbsKcal = Math.max(0, totalKcal - proteinKcal - fatKcal);
+    const carbsG = Math.round(carbsKcal / 4);
+    return { protein: proteinG, carbs: carbsG, fat: fatG };
+  }
+
+  function renderMacros(elementId, macros) {
+    document.getElementById(elementId).innerHTML =
+      `<span>🥩 <strong>${macros.protein}g</strong> proteína</span>` +
+      `<span>🍞 <strong>${macros.carbs}g</strong> carbohidratos</span>` +
+      `<span>🥑 <strong>${macros.fat}g</strong> grasas</span>`;
+  }
+
+  let lastResult = null;
+
+  function getBmiCategory(bmi) {
+    if (bmi < 18.5) return 'Bajo peso';
+    if (bmi < 25) return 'Peso normal';
+    if (bmi < 30) return 'Sobrepeso';
+    return 'Obesidad';
+  }
+
+  function animateNumber(el, endValue, suffix = '', duration = 700) {
+    el.textContent = endValue.toLocaleString('es-ES') + suffix;
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(endValue * eased);
+      el.textContent = current.toLocaleString('es-ES') + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  const PRINT_LOGO_MARK = `<svg class="print-logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M24 4 C13 4 4 13 4 24 C4 30.5 7.1 36.3 12 39.9" stroke="#191919" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M24 44 C35 44 44 35 44 24 C44 17.5 40.9 11.7 36 8.1" stroke="#191919" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M12 39.9 L6 40.5 L10 34.5 Z" fill="#191919"/>
+    <path d="M36 8.1 L42 7.5 L38 13.5 Z" fill="#191919"/>
+  </svg>`;
+
+  function buildPrintSheet(r) {
+    const dateStr = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+    const rows = [
+      { label: 'Déficit', kcal: r.deficit, macros: r.deficitMacros },
+      { label: 'Mantenimiento', kcal: r.tdee, macros: r.maintenanceMacros },
+      { label: 'Superávit', kcal: r.surplus, macros: r.surplusMacros }
+    ];
+
+    return `
+      <div class="print-brand">${PRINT_LOGO_MARK}<span>Metabolismo</span></div>
+      <h1>Mi consulta nutricional</h1>
+      <p class="print-meta">Generado el ${dateStr} con la Calculadora de Metabolismo Basal</p>
+
+      <div class="print-hairline"></div>
+
+      <div class="print-grid">
+        <div>
+          <h2>Mis datos</h2>
+          <dl class="print-datalist">
+            <div><dt>Sexo</dt><dd>${r.genderLabel}</dd></div>
+            <div><dt>Peso</dt><dd>${r.weight} kg</dd></div>
+            <div><dt>Altura</dt><dd>${r.height} cm</dd></div>
+            <div><dt>Edad</dt><dd>${r.age} años</dd></div>
+            <div><dt>Actividad</dt><dd>${r.activityLabel}</dd></div>
+            <div><dt>Perfil</dt><dd>${AGE_LABELS[r.ageGroup]} · ${TIER_LABELS[r.tier]}</dd></div>
+          </dl>
+          <p class="print-note">BMR: ${Math.round(r.bmr)} kcal/día (Harris-Benedict) &middot; IMC: ${r.bmi.toFixed(1)} (${r.bmiCategory})</p>
+
+          ${r.conditions.length ? `
+          <div class="print-tag-list">
+            ${r.conditions.map(id => `<span class="print-tag">${CONDITION_CONTENT[id].label}</span>`).join('')}
+          </div>
+          ` : ''}
+        </div>
+
+        <div>
+          <h2>Calorías y macronutrientes</h2>
+          <div class="print-calorie-compare">
+            ${rows.map(row => `
+              <div class="print-calorie">
+                <span class="print-calorie-label">${row.label}</span>
+                <span class="print-calorie-kcal">${Math.round(row.kcal)} kcal</span>
+                <span class="print-calorie-macros">${row.macros.protein}g P &middot; ${row.macros.carbs}g C &middot; ${row.macros.fat}g G</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="print-hairline"></div>
+
+      <h2>Preguntas para hacerle a mi nutricionista</h2>
+      <ol class="print-questions">
+        ${r.questions.map(q => `<li>${q}<span class="print-line"></span></li>`).join('')}
+      </ol>
+
+      ${r.comments ? `
+      <div class="print-hairline"></div>
+      <h2>Comentarios / notas</h2>
+      <p class="print-comments">${escapeHtml(r.comments)}</p>
+      ` : ''}
+
+      <p class="print-footer">Generado con la Calculadora de Metabolismo Basal &middot; Esta información es orientativa y no reemplaza una consulta profesional.</p>
+    `;
+  }
+
+  function renderExerciseItems(items) {
+    return items.map(it =>
+      `<div class="exercise-item"><div class="exercise-name">${it.name}</div><div class="exercise-why">${it.why}</div></div>`
+    ).join('');
+  }
+
+  function renderExerciseSection(ageGroup, tier) {
+    const container = document.getElementById('exerciseDynamic');
+
+    if (ageGroup === 'menor') {
+      container.innerHTML = `<div class="exercise-item"><div class="exercise-why">Como sos menor de edad, tu cuerpo todavía está en crecimiento y las recomendaciones de entrenamiento cambian según tu etapa de desarrollo. Lo mejor es que un profesional (médico, kinesiólogo o profesor de educación física) te arme un plan apropiado para tu edad.</div></div>`;
+      return;
+    }
+
+    const c = EXERCISE_CONTENT[ageGroup];
+    container.innerHTML = `
+      <div class="exercise-block">
+        <div class="exercise-block-header"><span class="exercise-icon">🔥</span><span class="exercise-block-title cardio">Cardio</span></div>
+        ${renderExerciseItems(c.cardio)}
+      </div>
+      <div class="exercise-block">
+        <div class="exercise-block-header"><span class="exercise-icon">💪</span><span class="exercise-block-title strength">Fuerza</span></div>
+        ${renderExerciseItems(c.strength)}
+      </div>
+      <div class="activity-tip"><strong>Según tu nivel actual (${TIER_LABELS[tier]}):</strong> ${ACTIVITY_TIP[tier]}</div>
+    `;
+  }
+
+  function renderNutritionSection(ageGroup) {
+    const container = document.getElementById('nutritionDynamic');
+    container.innerHTML = renderExerciseItems(
+      NUTRITION_CONTENT[ageGroup].map(t => ({ name: t.title, why: t.text }))
+    );
+  }
+
+  const selectedConditions = new Set();
+
+  function updateConditionVisibility() {
+    document.querySelectorAll('.condition-chip').forEach(chip => {
+      const requiredGender = chip.dataset.gender;
+      if (requiredGender && requiredGender !== gender) {
+        chip.style.display = 'none';
+        if (chip.classList.contains('active')) {
+          chip.classList.remove('active');
+          selectedConditions.delete(chip.dataset.condition);
+        }
+      } else {
+        chip.style.display = '';
+      }
+    });
+  }
+
+  document.querySelectorAll('.gender-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      gender = btn.dataset.gender;
+      updateConditionVisibility();
+    });
+  });
+
+  document.querySelectorAll('.condition-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('active');
+      if (chip.classList.contains('active')) {
+        selectedConditions.add(chip.dataset.condition);
+      } else {
+        selectedConditions.delete(chip.dataset.condition);
+      }
+    });
+  });
+
+  updateConditionVisibility();
+
+  function toggleAccordion(header) {
+    const card = header.closest('.accordion');
+    if (!card) return;
+    const expanded = card.classList.toggle('expanded');
+    header.setAttribute('aria-expanded', String(expanded));
+  }
+
+  function setAccordionExpanded(id, expanded) {
+    const card = document.getElementById(id);
+    if (!card) return;
+    card.classList.toggle('expanded', expanded);
+    const header = card.querySelector('.accordion-header');
+    if (header) header.setAttribute('aria-expanded', String(expanded));
+  }
+
+  document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', () => toggleAccordion(header));
+    header.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleAccordion(header);
+      }
+    });
+  });
+
+  document.getElementById('calcBtn').addEventListener('click', () => {
+    const weight = parseFloat(document.getElementById('weight').value);
+    const height = parseFloat(document.getElementById('height').value);
+    const age = parseFloat(document.getElementById('age').value);
+    const activity = parseFloat(document.getElementById('activity').value);
+    const errorMsg = document.getElementById('errorMsg');
+    const results = document.getElementById('results');
+    const exerciseCard = document.getElementById('exerciseCard');
+    const nutritionCard = document.getElementById('nutritionCard');
+    const questionsCard = document.getElementById('questionsCard');
+    const healthCard = document.getElementById('healthCard');
+    const mealPlanCard = document.getElementById('mealPlanCard');
+    const minorWarning = document.getElementById('minorWarning');
+    const layoutRoot = document.getElementById('layoutRoot');
+
+    if (!weight || !height || !age || weight <= 0 || height <= 0 || age <= 0) {
+      errorMsg.style.display = 'block';
+      results.classList.remove('visible');
+      exerciseCard.classList.remove('visible');
+      nutritionCard.classList.remove('visible');
+      questionsCard.classList.remove('visible');
+      healthCard.classList.remove('visible');
+      mealPlanCard.classList.remove('visible');
+      minorWarning.classList.remove('visible');
+      layoutRoot.classList.remove('has-results');
+      return;
+    }
+    errorMsg.style.display = 'none';
+    layoutRoot.classList.add('has-results');
+
+    let bmr;
+    if (gender === 'male') {
+      bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+    } else {
+      bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+    }
+
+    const tdee = bmr * activity;
+    const deficit = tdee - 500;
+    const surplus = tdee + 500;
+
+    const bmi = weight / ((height / 100) ** 2);
+    document.getElementById('bmiValue').textContent = bmi.toFixed(1);
+    document.getElementById('bmiMarker').style.left = Math.min(100, Math.max(0, ((bmi - 14) / (36 - 14)) * 100)) + '%';
+    document.getElementById('bmiCategory').textContent = getBmiCategory(bmi);
+
+    animateNumber(document.getElementById('bmrValue'), Math.round(bmr));
+    animateNumber(document.getElementById('tdeeValue'), Math.round(tdee));
+    animateNumber(document.getElementById('deficitValue'), Math.round(deficit), ' kcal');
+    animateNumber(document.getElementById('maintenanceValue'), Math.round(tdee), ' kcal');
+    animateNumber(document.getElementById('surplusValue'), Math.round(surplus), ' kcal');
+
+    const ageGroup = getAgeGroup(age);
+    const tier = getActivityTier(activity);
+
+    const deficitMacros = computeMacros(weight, deficit, ageGroup);
+    const maintenanceMacros = computeMacros(weight, tdee, ageGroup);
+    const surplusMacros = computeMacros(weight, surplus, ageGroup);
+    renderMacros('deficitMacros', deficitMacros);
+    renderMacros('maintenanceMacros', maintenanceMacros);
+    renderMacros('surplusMacros', surplusMacros);
+    document.getElementById('macroNote').textContent =
+      `Proteína calculada con ${PROTEIN_PER_KG[ageGroup]} g por kilo de tu peso según tu edad; las grasas son ~28% de las calorías y el resto son carbohidratos.`;
+
+    document.getElementById('profileBadge').textContent = `🎯 Tu perfil: ${AGE_LABELS[ageGroup]} · Nivel ${TIER_LABELS[tier]}`;
+    renderExerciseSection(ageGroup, tier);
+    renderNutritionSection(ageGroup);
+    renderMealPlanSection(ageGroup);
+    document.getElementById('extraQuestion').textContent = EXTRA_QUESTION[ageGroup];
+    minorWarning.classList.toggle('visible', ageGroup === 'menor');
+
+    const conditions = Array.from(selectedConditions);
+    renderHealthSection(conditions);
+
+    results.classList.add('visible');
+    exerciseCard.classList.add('visible');
+    nutritionCard.classList.add('visible');
+    questionsCard.classList.add('visible');
+
+    setAccordionExpanded('results', true);
+    setAccordionExpanded('exerciseCard', false);
+    setAccordionExpanded('nutritionCard', false);
+    setAccordionExpanded('mealPlanCard', false);
+    setAccordionExpanded('healthCard', false);
+    setAccordionExpanded('questionsCard', false);
+
+    (minorWarning.classList.contains('visible') ? minorWarning : results).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    lastResult = {
+      genderLabel: gender === 'male' ? 'Hombre' : 'Mujer',
+      weight, height, age,
+      activityLabel: document.getElementById('activity').selectedOptions[0].textContent,
+      bmr, tdee, deficit, surplus, bmi, bmiCategory: getBmiCategory(bmi),
+      ageGroup, tier,
+      deficitMacros, maintenanceMacros, surplusMacros,
+      conditions,
+      questions: Array.from(document.querySelectorAll('#questionsList li')).map(li => li.textContent)
+    };
+  });
+
+  function drawRoundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function buildShareCanvas(r) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1150;
+    const ctx = canvas.getContext('2d');
+
+    const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1150);
+    bgGrad.addColorStop(0, '#0a0a0a');
+    bgGrad.addColorStop(1, '#1c2a20');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1080, 1350);
+
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = '#f7f4ec';
+    ctx.font = '700 44px Georgia, serif';
+    ctx.fillText('Mi Metabolismo Basal', 540, 130);
+
+    ctx.fillStyle = '#aeb8a4';
+    ctx.font = '26px Georgia, serif';
+    ctx.fillText('Calculado con la fórmula de Harris-Benedict', 540, 172);
+
+    ctx.fillStyle = '#8fd6ab';
+    ctx.font = '800 150px Georgia, serif';
+    ctx.fillText(Math.round(r.bmr).toLocaleString('es-ES'), 540, 380);
+
+    ctx.fillStyle = '#c9d2c4';
+    ctx.font = '30px Georgia, serif';
+    ctx.fillText('calorías/día en reposo', 540, 425);
+
+    ctx.fillStyle = '#f7f4ec';
+    ctx.font = '600 34px Georgia, serif';
+    ctx.fillText(`Gasto calórico total: ${Math.round(r.tdee).toLocaleString('es-ES')} kcal/día`, 540, 495);
+
+    const goals = [
+      { label: 'Déficit', value: Math.round(r.deficit), color: '#e15a4f' },
+      { label: 'Mantenimiento', value: Math.round(r.tdee), color: '#8fd6ab' },
+      { label: 'Superávit', value: Math.round(r.surplus), color: '#d4a557' }
+    ];
+    const boxW = 300, boxH = 160, gap = 30;
+    const startX = 540 - (boxW * 3 + gap * 2) / 2;
+    goals.forEach((g, i) => {
+      const x = startX + i * (boxW + gap);
+      const y = 555;
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      drawRoundedRect(ctx, x, y, boxW, boxH, 20);
+      ctx.fill();
+      ctx.strokeStyle = g.color;
+      ctx.lineWidth = 3;
+      drawRoundedRect(ctx, x, y, boxW, boxH, 20);
+      ctx.stroke();
+
+      ctx.fillStyle = '#c9d2c4';
+      ctx.font = '26px Georgia, serif';
+      ctx.fillText(g.label, x + boxW / 2, y + 45);
+
+      ctx.fillStyle = g.color;
+      ctx.font = '700 44px Georgia, serif';
+      ctx.fillText(g.value.toLocaleString('es-ES'), x + boxW / 2, y + 105);
+
+      ctx.fillStyle = '#8f988a';
+      ctx.font = '22px Georgia, serif';
+      ctx.fillText('kcal/día', x + boxW / 2, y + 140);
+    });
+
+    ctx.fillStyle = '#f7f4ec';
+    ctx.font = '700 32px Georgia, serif';
+    ctx.fillText('Macronutrientes (mantenimiento)', 540, 800);
+
+    const macros = [
+      { label: 'Proteína', value: r.maintenanceMacros.protein, color: '#e15a4f' },
+      { label: 'Carbohidratos', value: r.maintenanceMacros.carbs, color: '#d4a557' },
+      { label: 'Grasas', value: r.maintenanceMacros.fat, color: '#c17f5c' }
+    ];
+    const mW = 300, mGap = 30;
+    const mStartX = 540 - (mW * 3 + mGap * 2) / 2;
+    macros.forEach((m, i) => {
+      const x = mStartX + i * (mW + mGap);
+      const y = 840;
+      ctx.fillStyle = m.color;
+      ctx.font = '700 50px Georgia, serif';
+      ctx.fillText(m.value + 'g', x + mW / 2, y + 50);
+      ctx.fillStyle = '#c9d2c4';
+      ctx.font = '24px Georgia, serif';
+      ctx.fillText(m.label, x + mW / 2, y + 90);
+    });
+
+    ctx.fillStyle = '#f7f4ec';
+    ctx.font = '700 32px Georgia, serif';
+    ctx.fillText(`IMC: ${r.bmi.toFixed(1)} (${r.bmiCategory})`, 540, 1000);
+
+    ctx.fillStyle = '#8f988a';
+    ctx.font = '22px Georgia, serif';
+    ctx.fillText('El IMC es solo una referencia general', 540, 1040);
+
+    ctx.fillStyle = '#6f776a';
+    ctx.font = '24px Georgia, serif';
+    ctx.fillText('Generado con la Calculadora de Metabolismo Basal', 540, 1090);
+
+    return canvas;
+  }
+
+  document.getElementById('shareBtn').addEventListener('click', () => {
+    if (!lastResult) return;
+    const canvas = buildShareCanvas(lastResult);
+    const link = document.createElement('a');
+    link.download = 'mis-resultados.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    if (!lastResult) return;
+    lastResult.comments = document.getElementById('userComments').value.trim();
+    document.getElementById('printSheet').innerHTML = buildPrintSheet(lastResult);
+    window.print();
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const items = document.querySelectorAll('#questionsList li');
+    const text = Array.from(items).map((li, i) => `${i + 1}. ${li.textContent}`).join('\n');
+    const btn = document.getElementById('copyBtn');
+
+    const done = () => {
+      const original = 'Copiar preguntas';
+      btn.textContent = 'Copiado ✓';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 2000);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(done);
+    } else {
+      done();
+    }
+  });
+</script>
+</body>
+</html>

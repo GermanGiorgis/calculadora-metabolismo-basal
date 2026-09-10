@@ -32,7 +32,7 @@ Algunas técnicas usadas:
 No hace falta build ni dependencias. Cloná el repo y abrí `index.html` en el navegador, o serví la carpeta con cualquier servidor estático:
 
 ```bash
-git clone https://github.com/germanggiorgis/calculadora-metabolismo-basal.git
+git clone https://github.com/GermanGiorgis/calculadora-metabolismo-basal.git
 cd calculadora-metabolismo-basal
 npx serve .
 ```

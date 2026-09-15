@@ -4,6 +4,23 @@ Calculadora web de metabolismo basal (BMR) y gasto calórico total (TDEE), pensa
 
 **Demo en vivo:** https://calculadora-metabolismo-basal.vercel.app
 
+## Capturas
+
+<table>
+  <tr>
+    <td><img src="screenshots/01-hero.webp" alt="Portada de la calculadora"></td>
+    <td><img src="screenshots/02-formulario.webp" alt="Formulario de datos"></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/03-resultados.png" alt="Resultados: metabolismo basal, IMC y calorías"></td>
+    <td><img src="screenshots/04-ejercicios-nutricion.png" alt="Recomendaciones de ejercicio y nutrición"></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/05-plan-preguntas.png" alt="Plan de comidas y preguntas para el nutricionista"></td>
+    <td><img src="screenshots/06-glosario.png" alt="Glosario de términos"></td>
+  </tr>
+</table>
+
 ## Qué hace
 
 - Calcula BMR (fórmula de Harris-Benedict) y TDEE a partir de peso, altura, edad, sexo y nivel de actividad.
